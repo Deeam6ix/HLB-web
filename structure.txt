@@ -29,6 +29,6 @@ HLB web:
                 we should receive a EFT reference no. via whatsapp and also save to json file
                 EFT reference no should include person name, and ordernumber, as well as their cellphone numeber
                 this should directly be saved to a json file and sent to us on whatsapp
-        stop.
+    stop.
             
 
