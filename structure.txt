@@ -1,0 +1,34 @@
+HLB web:
+    start
+        create a json file to store all the hire dresses
+        create a json file to store all the buying dresses
+        Dresses to hire
+        Dresses to buy
+        Checkout button 
+        if Dresses to hire: THEN
+            All the dresses will be on a json file
+            Show all dresses from hiring section and lable (available to hire or nah)
+            date=allow users to choose date for hiring using calender
+            Have a checkout button
+            All user choices should be added to checkout
+            add a return button that takes you back
+        elif Dress to buy: THEN
+            SHOW ALL DRESSES for buy as in picture use fifa card format
+            allow user to pick a dress to add to cart the cart is the json file called users carts
+            add a return button.
+        elif Checkout: THEN
+            users etire cart shown total value
+            Cash on delivery
+            EFT (for online purchases)
+            if Cash on delivery:
+                ask for their full address and this should be saved to a json file with receipt no
+                redirect the user to whatsapp having a predetermined script with all the order details
+                in the message box for them to send to me here is my whatsapp number 069 634 5791
+                R20 delivery fee
+            if EFT:
+                we should receive a EFT reference no. via whatsapp and also save to json file
+                EFT reference no should include person name, and ordernumber, as well as their cellphone numeber
+                this should directly be saved to a json file and sent to us on whatsapp
+        stop.
+            
+
