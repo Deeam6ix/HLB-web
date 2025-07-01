@@ -1,16 +1,242 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>HLB Web</title>
-    <link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HLB Dress Hire & Buy</title>
+  <style>
+    :root {
+      --black: #000000;
+      --white: #ffffff;
+      --purple: #ff9c27b0;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--black);
+      color: var(--white);
+      text-align: center;
+    }
+    header {
+      background-color: var(--purple);
+      padding: 20px;
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+    main {
+      padding: 20px;
+    }
+    .section {
+      display: none;
+      margin-top: 20px;
+    }
+    button {
+      background-color: var(--purple);
+      border: none;
+      color: var(--white);
+      padding: 12px 24px;
+      margin: 8px;
+      font-size: 1em;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .card {
+      background-color: #1a1a1a;
+      border: 1px solid var(--white);
+      padding: 16px;
+      border-radius: 10px;
+      margin: 10px auto;
+      width: 80%;
+      max-width: 400px;
+    }
+    input, select {
+      padding: 8px;
+      width: 80%;
+      margin: 10px 0;
+      border-radius: 4px;
+      border: none;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>👗 Welcome to HLB Dress Hire & Buy</h1>
-        <button onclick="location.href='/hire'">Hire a Dress</button>
-        <button onclick="location.href='/buy'">Buy a Dress</button>
-        <button onclick="location.href='/checkout'">Checkout</button>
+  <header>👗 HLB Dress Hire & Buy</header>
+  <main>
+    <div>
+      <button onclick="showSection('hire')">Hire a Dress</button>
+      <button onclick="showSection('buy')">Buy a Dress</button>
+      <button onclick="showSection('checkout')">Checkout</button>
     </div>
+
+    <!-- Hire Section -->
+    <div class="section" id="hireSection">
+      <h2>Dresses to Hire</h2>
+      <div id="hireList"></div>
+      <button onclick="showSection('home')">⬅ Return</button>
+    </div>
+
+    <!-- Buy Section -->
+    <div class="section" id="buySection">
+      <h2>Dresses to Buy</h2>
+      <div id="buyList"></div>
+      <button onclick="showSection('home')">⬅ Return</button>
+    </div>
+
+    <!-- Checkout Section -->
+    <div class="section" id="checkoutSection">
+      <h2>Checkout</h2>
+      <div id="checkoutList"></div>
+      <h3>Total: R<span id="totalPrice">0</span></h3>
+
+      <div>
+        <h4>Choose Payment Method:</h4>
+        <button onclick="cashPayment()">💵 Cash on Delivery</button>
+        <button onclick="eftPayment()">💳 EFT</button>
+      </div>
+
+      <!-- Cash Info -->
+      <div id="cashForm" style="display:none">
+        <input type="text" id="address" placeholder="Enter full delivery address"/><br/>
+        <button onclick="sendCashOrder()">Send via WhatsApp</button>
+      </div>
+
+      <!-- EFT Info -->
+      <div id="eftForm" style="display:none">
+        <input type="text" id="refName" placeholder="Your Name" />
+        <input type="text" id="refPhone" placeholder="Your Phone Number" />
+        <input type="text" id="refNumber" placeholder="EFT Reference Number" />
+        <button onclick="sendEFTOrder()">Send via WhatsApp</button>
+      </div>
+
+      <button onclick="showSection('home')">⬅ Return</button>
+    </div>
+  </main>
+
+  <script>
+    const hireDresses = [
+      { id: 1, name: "Purple Elegance", price: 150, available: true },
+      { id: 2, name: "Pink Royale", price: 130, available: false },
+      { id: 3, name: "Golden Hour", price: 180, available: true },
+    ];
+
+    const buyDresses = [
+      { id: 4, name: "Queen Vibe", price: 800 },
+      { id: 5, name: "Blossom Babe", price: 950 },
+      { id: 6, name: "Sunset Chic", price: 990 },
+    ];
+
+    let cart = [];
+
+    function showSection(section) {
+      document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
+      if (section === 'hire') {
+        document.getElementById('hireSection').style.display = 'block';
+        renderHire();
+      } else if (section === 'buy') {
+        document.getElementById('buySection').style.display = 'block';
+        renderBuy();
+      } else if (section === 'checkout') {
+        document.getElementById('checkoutSection').style.display = 'block';
+        renderCheckout();
+      }
+    }
+
+    function renderHire() {
+      const container = document.getElementById('hireList');
+      container.innerHTML = '';
+      hireDresses.forEach(dress => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <h3>${dress.name}</h3>
+          <p>Price: R${dress.price}</p>
+          <p>Status: ${dress.available ? 'Available' : 'Not Available'}</p>
+          ${dress.available ? `
+            <input type="date" id="date_${dress.id}" />
+            <button onclick="addToCart('${dress.name}', ${dress.price}, document.getElementById('date_${dress.id}').value)">Add to Cart</button>
+          ` : ''}
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderBuy() {
+      const container = document.getElementById('buyList');
+      container.innerHTML = '';
+      buyDresses.forEach(dress => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <h3>${dress.name}</h3>
+          <p>Price: R${dress.price}</p>
+          <button onclick="addToCart('${dress.name}', ${dress.price}, 'Buy Now')">Add to Cart</button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function addToCart(name, price, info) {
+      if (!info) {
+        alert("Please choose a date.");
+        return;
+      }
+      cart.push({ name, price, info });
+      alert(`${name} added to cart!`);
+    }
+
+    function renderCheckout() {
+      const container = document.getElementById('checkoutList');
+      container.innerHTML = '';
+      let total = 0;
+      cart.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <h4>${item.name}</h4>
+          <p>Price: R${item.price}</p>
+          <p>Info: ${item.info}</p>
+        `;
+        total += item.price;
+        container.appendChild(card);
+      });
+      document.getElementById('totalPrice').innerText = total + 20; // R20 delivery fee
+    }
+
+    function cashPayment() {
+      document.getElementById('cashForm').style.display = 'block';
+      document.getElementById('eftForm').style.display = 'none';
+    }
+
+    function eftPayment() {
+      document.getElementById('eftForm').style.display = 'block';
+      document.getElementById('cashForm').style.display = 'none';
+    }
+
+    function sendCashOrder() {
+      const address = document.getElementById('address').value;
+      if (!address) return alert("Enter full address!");
+      let message = `HLB Cash on Delivery Order:%0AAddress: ${address}%0AItems:%0A`;
+      cart.forEach(item => {
+        message += `- ${item.name} (R${item.price}) [${item.info}]%0A`;
+      });
+      message += `Total incl R20 delivery: R${cart.reduce((a, b) => a + b.price, 0) + 20}`;
+      window.open(`https://wa.me/27696345791?text=${message}`, '_blank');
+    }
+
+    function sendEFTOrder() {
+      const name = document.getElementById('refName').value;
+      const phone = document.getElementById('refPhone').value;
+      const reference = document.getElementById('refNumber').value;
+      if (!name || !phone || !reference) return alert("Fill in all EFT details!");
+      let message = `HLB EFT Payment:%0AName: ${name}%0APhone: ${phone}%0ARef: ${reference}%0AOrder:%0A`;
+      cart.forEach(item => {
+        message += `- ${item.name} (R${item.price}) [${item.info}]%0A`;
+      });
+      message += `Total incl R20 delivery: R${cart.reduce((a, b) => a + b.price, 0) + 20}`;
+      window.open(`https://wa.me/27696345791?text=${message}`, '_blank');
+    }
+
+    // Show Home by Default
+    showSection('home');
+  </script>
 </body>
 </html>
